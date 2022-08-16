@@ -1,0 +1,42 @@
+a)
+
+SELECT * FROM users WHERE created_at >= NOW() - INTERVAL 2 DAY
+
+b)
+
+SELECT orders.id as orderId, first_name, last_name FROM orders INNER JOIN users on (orders.user_id = users.id)
+SELECT SUM(value) as total_value FROM orders
+
+c)
+
+SELECT * FROM (SELECT first_name, last_name, COUNT(orders.id) as total FROM orders INNER JOIN users on (users.id = orders.user_id) 
+GROUP BY orders.user_id) as alias WHERE alias.total >= 2
+
+d)
+
+SELECT first_name, last_name, orders.id as orderId, COUNT(order_items.id) as totalProducts
+FROM orders 
+LEFT JOIN order_items on (orders.id = order_items.order_id) 
+INNER JOIN users on (users.id = orders.user_id) GROUP BY orders.id
+
+e)
+
+SELECT alias.first_name as fname, alias.last_name as lname, alias.orderId as orId 
+FROM 
+(SELECT first_name, last_name, orders.id as orderId, COUNT(order_items.id) as totalProducts 
+FROM 
+orders 
+LEFT JOIN order_items on (orders.id = order_items.order_id) 
+INNER JOIN users on (users.id = orders.user_id) GROUP BY orders.id) 
+as alias WHERE alias.totalProducts >= 2
+
+f)
+
+SELECT alias.first_name as fname, alias.last_name as lname, alias.email as mail, alias.phone as number 
+FROM 
+(SELECT first_name, last_name, email, phone, orders.id as orderId, COUNT(DISTINCT(order_items.product_id)) as totalProducts 
+FROM 
+orders 
+LEFT JOIN order_items on (orders.id = order_items.order_id) 
+INNER JOIN users on (users.id = orders.user_id) GROUP BY orders.id) 
+as alias WHERE alias.totalProducts >= 3
